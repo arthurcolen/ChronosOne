@@ -1,0 +1,434 @@
+/*Declarações iniciais - Início*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #f9fafb;
+    color: #111827;
+    line-height: 1.5;
+}
+
+/* Layout Principal */
+.dashboard {
+    min-height: 100vh;
+    display: flex;
+}
+
+/*Declarações iniciais - Fim*/
+
+p#welcome {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+p#user {
+    font-weight: 500;
+}
+
+/*Botão Menu Toggle Mobile - Início*/
+#menu-toggle {
+    display: none;
+}
+
+.menu-btn {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+/*Botão Menu Toggle Mobile - Fim*/
+
+/* Barra lateral (aside) - Início */
+.barra-lateral {
+    width: 16rem;
+    background: white;
+    border-right: 1px solid #e5e7eb;
+    padding: 1.5rem;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+}
+
+/* Navegação lateral */
+
+.nav-menu-style {
+    list-style: none;
+    margin-bottom: 1.5rem;
+}
+
+.nav-item-style {
+    margin-bottom: 0.5rem;
+}
+
+.nav-link-style {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: #6b7280;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.nav-link-style:hover {
+    background: #f3f4f6;
+}
+
+.nav-link-style#active-item {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+
+/* Barra lateral (aside) - Fim */
+
+.separator {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 1.5rem 0;
+}
+
+/* Main Content - Início */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+}
+
+.content-wrapper {
+    max-width: 72rem;
+    margin: 0 auto;
+}
+
+.logo-content {
+    margin: 0 0 2rem 0;
+}
+
+.logo-content a {
+    display: inline-block;
+    border: 1px solid #4A90E2;
+    border-radius: 0.5rem;
+}
+
+.logo-img {
+    width: 6rem;
+    border-radius: 0.5rem;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+.add-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #111827;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.add-btn:hover {
+    background: #374151;
+}
+
+/* Layout Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.main-section,
+.stats-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Cards - Início */
+.card-style {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.card-style-header {
+    padding: 1.25rem 1.25rem 1rem;
+}
+
+.card-style-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #111827;
+}
+
+article header .card-style-title {
+    justify-content: center;
+}
+
+.card-style-content {
+    padding: 0 1.25rem 1.25rem;
+}
+
+.card-style-content a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Próximo Compromisso */
+.next-appointment {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.next-appointment a {
+    text-decoration: none;
+}
+
+.next-appointment .card-style-title {
+    color: #1e3a8a;
+}
+
+.appointment-info {
+    display: flex;
+    gap: 1rem;
+}
+
+.appointment-icon {
+    background: #2563eb;
+    border-radius: 0.5rem;
+    color: #9ec2ff;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    max-width: 25%;
+}
+
+.appointment-image {
+    border-radius: 0.5rem;
+    max-width: 100%;
+}
+
+.appointment-details h4 {
+    color: #1e3a8a;
+    margin-bottom: 0.25rem;
+}
+
+.appointment-time {
+    color: #1d4ed8;
+    margin-bottom: 0.5rem;
+}
+
+.appointment-desc {
+    color: #2563eb;
+    font-size: 0.875rem;
+}
+
+/* Atividades Grid */
+.activity-item {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid;
+    margin: 0.5rem;
+}
+
+.activity-item:hover {
+    transform: scale(1.02);
+}
+
+.activity-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.badge {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Activity Colors */
+.activity-color {
+    background: #ecf4ff;
+    color: #101c3f;
+    border-color: #bfdbfe;
+}
+
+/* Stats Card */
+.stats-card-style .card-style-content {
+    text-align: center;
+}
+
+#stats-number {
+    font-size: 2rem;
+    color: #2563eb;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.stats-text {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+/* Chart */
+.chart-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+/*Footer*/
+footer {
+  background-color: #f5f5f5;
+  border-top: 1px solid #ccc;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 0.9rem;
+  color: #333;
+  position: relative;
+}
+
+
+/* Responsividade */
+
+/* Overlay para mobile */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 998;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .menu-btn {
+        display: block;
+    }
+
+    .barra-lateral {
+        position: fixed;
+        top: 0;
+        left: -17.5rem;
+        height: 100vh;
+        z-index: 999;
+        width: 17.5rem;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #menu-toggle:checked~.dashboard .barra-lateral {
+        left: 0;
+    }
+
+    #menu-toggle:checked~.menu-btn {
+        display: none;
+    }
+
+
+    .main-content {
+        width: 100%;
+        padding: 4.5rem 1rem 1rem;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .add-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .add-btn .btn-text {
+        display: none;
+    }
+
+    #stats-number {
+        font-size: 1.75rem;
+    }
+
+    .chart-bar-bg,
+    .chart-bar {
+        height: 0.375rem;
+    }
+
+    .overlay {
+        display: block;
+    }
+
+    #menu-toggle:checked~.overlay {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1279px) {
+    .barra-lateral {
+        width: 14rem;
+    }
+}
+
+@media (min-width: 1280px) {
+    .dashboard-grid {
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+
+    #stats-number {
+        font-size: 2.25rem;
+    }
+
+    .chart-bar-bg,
+    .chart-bar {
+        height: 0.75rem;
+    }
+}
