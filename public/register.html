@@ -28,6 +28,14 @@
 </head>
 
 <body>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const login = checkIfLogged();
+            if (!login) {
+                window.location.href = "login.html";
+            }
+        });
+    </script>
     <input type="checkbox" id="menu-toggle">
     <label for="menu-toggle" class="menu-btn">
         <i class="fa-solid fa-bars fa-lg"></i>
@@ -48,6 +56,12 @@
                         <a href="index.html" class="nav-link-style">
                             <i class="fas fa-regular fa-house"></i>
                             <span>HomePage</span>
+                        </a>
+                    </li>
+                    <li class="nav-item-style">
+                        <a href="favorites.html" class="nav-link-style">
+                            <i class="fas fa-star"></i>
+                            <span>Página de Favoritos</span>
                         </a>
                     </li>
                     <li class="nav-item-style">

@@ -1,23 +1,58 @@
 const DADOS_URL = "http://localhost:3000/dados";
 const META_URL = "http://localhost:3000/dadosMeta";
 
+// ======== VERIFICA SE O USUÁRIO ESTÁ LOGADO ========
+function checkIfLogged() {
+    const userData = sessionStorage.getItem("usuario");
+    if (!userData) {
+        return false;
+    }
+
+    try {
+        const userId = JSON.parse(userData);
+        return !!userId;
+    } catch (err) {
+        console.error("Erro ao ler sessionStorage:", err);
+        return false;
+    }
+}
+
+function logout() {
+    if (!confirm("Tem certeza que deseja sair?")) return;
+    sessionStorage.removeItem("usuario");
+    window.location.reload();
+}
+
+async function getUser() {
+    let userId = sessionStorage.getItem("usuario");
+    const container = document.getElementById("user");
+    userId = JSON.parse(userId);
+    let user = await fetch(`http://localhost:3000/usuarios/${userId}`);
+    user = await user.json();
+    let userName = user.nome.split(" ");
+    container.innerHTML = (userName.length >= 1) ? `${userName[0]} ${userName[userName.length - 1]}` : `${userName[0]}`;
+}
+
 // ======== LISTAR AS 6 PRIMEIRAS ATIVIDADES ========
 async function loadMainActivities() {
     const container = document.getElementById('activities-cards');
+    let user = sessionStorage.getItem("usuario");
+    user = JSON.parse(user);
     try {
         const res = await fetch(`${DADOS_URL}`);
-        const atividades = await res.json();
+        const resJson = await res.json();
+        const atividades = resJson.filter(a => a.user_id === user)
         const metaRes = await fetch(META_URL);
         const meta = await metaRes.json();
         atividades.sort((a, b) => new Date(a.date.start) - new Date(b.date.start));
-        for (i = 0; i < 6; i++) {
+        for (i = 0; i < atividades.length && i < 6; i++) {
             const activity = atividades[i];
             var inicio = activity.date?.start?.slice(5, 13) || "";
             inicio = inicio.replace("T", " ");
             var fim = activity.date?.end?.slice(5, 13) || "";
             fim = fim.replace("T", " ");
-
-            container.innerHTML += `
+            if (!activity.favorite) {
+                container.innerHTML += `
                 <div class="col-12 col-sm-6 col-lg-4 card-style-content" id="${activity.id}">
                     <a href="details.html?id=${activity.id}&category=${activity.category}">
                         <div class="activity-item activity-color">
@@ -26,20 +61,39 @@ async function loadMainActivities() {
                                     <i class="${meta[activity.category].icone}"></i>
                                     <span>${activity.category}</span>
                                 </div>
-                                <button class="btn btn-sm btn-outline-secondary border-0 delete-btn col-2" 
-                                    onclick="event.preventDefault(); event.stopPropagation(); deleteActivity(${activity.id})">
-                                    <i class="fa-solid fa-xmark fa-lg"></i>
+                                <button class="btn btn-sm btn-outline-secondary border-0 col-2" 
+                                    onclick="event.preventDefault(); event.stopPropagation(); setFavorite(${activity.id})">
+                                    <i class="fa-regular fa-star fa-lg"></i>
                                 </button>
                                 </div>
                             <p>${inicio}h | ${fim}h</p>
                         </div>
                     </a>
                 </div>`;
+            }
+            else {
+                container.innerHTML += `
+                <div class="col-12 col-sm-6 col-lg-4 card-style-content" id="${activity.id}">
+                    <a href="details.html?id=${activity.id}&category=${activity.category}">
+                        <div class="activity-item activity-color">
+                            <div class="activity-header row">
+                                <div class="col">
+                                    <i class="${meta[activity.category].icone}"></i>
+                                    <span>${activity.category}</span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary border-0 col-2" 
+                                    onclick="event.preventDefault(); event.stopPropagation(); setFavorite(${activity.id})">
+                                    <i class="fa-solid fa-star fa-lg"></i>
+                                </button>
+                                </div>
+                            <p>${inicio}h | ${fim}h</p>
+                        </div>
+                    </a>
+                </div>`;
+            };
         };
 
-        var resCount = await fetch(`${DADOS_URL}`);
-        resCount = await resCount.json();
-        if (resCount.length > 6) {
+        if (atividades.length > 6) {
             container.innerHTML += `
             <div class="col-12 text-center mt-3">
                 <button id="btn-expandir" class="btn btn-primary">Ver mais</button>
@@ -56,9 +110,12 @@ async function loadMainActivities() {
 // ======== CARREGAR TODAS AS ATIVIDADES ========
 async function loadAllActivities() {
     const container = document.getElementById('activities-cards');
+    let user = sessionStorage.getItem("usuario");
+    user = JSON.parse(user);
     try {
-        const res = await fetch(DADOS_URL);
-        const atividades = await res.json();
+        const res = await fetch(`${DADOS_URL}`);
+        const resJson = await res.json();
+        const atividades = resJson.filter(a => a.user_id === user)
         const metaRes = await fetch(META_URL);
         const meta = await metaRes.json();
 
@@ -69,8 +126,8 @@ async function loadAllActivities() {
             inicio = inicio.replace("T", " ");
             var fim = activity.date?.end?.slice(5, 13) || "";
             fim = fim.replace("T", " ");
-
-            container.innerHTML += `
+            if (!activity.favorite) {
+                container.innerHTML += `
                 <div class="col-12 col-sm-6 col-lg-4 card-style-content" id="${activity.id}">
                     <a href="details.html?id=${activity.id}&category=${activity.category}">
                         <div class="activity-item activity-color">
@@ -79,12 +136,135 @@ async function loadAllActivities() {
                                     <i class="${meta[activity.category].icone}"></i>
                                     <span>${activity.category}</span>
                                 </div>
-                                <button class="btn btn-sm btn-outline-secondary border-0 delete-btn col-2" 
-                                    onclick="event.preventDefault(); event.stopPropagation(); deleteActivity(${activity.id})">
-                                    <i class="fa-solid fa-xmark fa-lg"></i>
+                                <button class="btn btn-sm btn-outline-secondary border-0 col-2" 
+                                    onclick="event.preventDefault(); event.stopPropagation(); setFavorite(${activity.id})">
+                                    <i class="fa-regular fa-star fa-lg"></i>
                                 </button>
                                 </div>
                             <p>${inicio}h | ${fim}h</p>
+                        </div>
+                    </a>
+                </div>`;
+            }
+            else {
+                container.innerHTML += `
+                <div class="col-12 col-sm-6 col-lg-4 card-style-content" id="${activity.id}">
+                    <a href="details.html?id=${activity.id}&category=${activity.category}">
+                        <div class="activity-item activity-color">
+                            <div class="activity-header row">
+                                <div class="col">
+                                    <i class="${meta[activity.category].icone}"></i>
+                                    <span>${activity.category}</span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary border-0 col-2" 
+                                    onclick="event.preventDefault(); event.stopPropagation(); setFavorite(${activity.id})">
+                                    <i class="fa-solid fa-star fa-lg"></i>
+                                </button>
+                                </div>
+                            <p>${inicio}h | ${fim}h</p>
+                        </div>
+                    </a>
+                </div>`;
+            }
+        });
+    } catch (err) {
+        container.innerHTML = "<p>Erro ao carregar atividades.</p>";
+        console.error(err);
+    }
+}
+
+// ======== PESQUISAR ITENS ========
+async function searchItems(text) {
+    const container = document.getElementById('activities-cards');
+    let user = JSON.parse(sessionStorage.getItem("usuario"));
+    container.innerHTML = "";
+
+    // se busca vazia → volta ao padrão
+    if (text.trim() === "") {
+        loadMainActivities();
+        return;
+    }
+
+    // sempre limpar antes de renderizar (evita duplicados)
+
+    const res = await fetch(DADOS_URL);
+    const resJson = await res.json();
+    const atividades = resJson.filter(a => a.user_id === user);
+
+    const meta = await (await fetch(META_URL)).json();
+
+    // busca apenas por title
+    const filtered = atividades.filter(a =>
+        a.title.toLowerCase().includes(text.toLowerCase())
+    );
+
+    filtered.forEach(activity => {
+        const inicio = (activity.date?.start || "").slice(5, 13).replace("T", " ");
+        const fim = (activity.date?.end || "").slice(5, 13).replace("T", " ");
+        const starClass = activity.favorite ? "fa-solid" : "fa-regular";
+
+        container.innerHTML += `
+        <div class="col-12 col-sm-6 col-lg-4 card-style-content" id="${activity.id}">
+            <a href="details.html?id=${activity.id}&category=${activity.category}">
+                <div class="activity-item activity-color">
+                    <div class="activity-header row">
+                        <div class="col">
+                            <i class="${meta[activity.category].icone}"></i>
+                            <span>${activity.category}</span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary border-0 col-2"
+                            onclick="event.preventDefault(); event.stopPropagation(); setFavorite(${activity.id})">
+                            <i class="${starClass} fa-star fa-lg"></i>
+                        </button>
+                    </div>
+                    <p>${inicio}h | ${fim}h</p>
+                </div>
+            </a>
+        </div>`;
+    });
+}
+
+// ======== CARREGAR TODAS AS ATIVIDADES FAVORITAS ========
+async function loadFavoriteActivities() {
+    const container = document.getElementById('favorite-items');
+    let user = sessionStorage.getItem("usuario");
+    user = JSON.parse(user);
+    try {
+        const res = await fetch(`${DADOS_URL}`);
+        const resJson = await res.json();
+        const atividades = resJson.filter(a => a.user_id === user && a.favorite == true)
+        const metaRes = await fetch(META_URL);
+        const meta = await metaRes.json();
+
+        container.innerHTML = "";
+        atividades.forEach(activity => {
+            var inicio = activity.date?.start?.slice(5, 13) || "";
+            inicio = inicio.replace("T", " ");
+            var fim = activity.date?.end?.slice(5, 13) || "";
+            fim = fim.replace("T", " ");
+            container.innerHTML += `
+                <div class="col-12 col-sm-6 col-lg-6 card-style-content">
+                    <a href="details.html?id=${activity.id}&category=${activity.category}">
+                        <div class="card-style-content">
+                            <div class="appointment-info">
+                                <div class="appointment-icon">
+                                    <i class="${meta[activity.category].icone} fa-xl"></i>
+                                </div>
+                                <div class="appointment-details">
+                                    <div class="activity-header row">
+                                        <div class="col-9">
+                                            <h4>${activity.title}</h4>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-secondary border-0 col-2" 
+                                        onclick="event.preventDefault(); event.stopPropagation(); setFavorite(${activity.id})">
+                                        <i class="fa-solid fa-star fa-lg"></i>
+                                        </button>
+                                    </div>
+                                    <p class="appointment-time">${inicio} | ${fim}</p>
+                                    <p class="appointment-desc">${activity.category} - ${activity.local}</p>
+                                    <p class="appointment-desc">${activity.description}</p>
+                                </div>
+                            </div>
                         </div>
                     </a>
                 </div>`;
@@ -98,9 +278,12 @@ async function loadAllActivities() {
 // ======== PRÓXIMO COMPROMISSO ========
 async function getNextAppointment() {
     const container = document.getElementById('next-appointment');
+    let user = sessionStorage.getItem("usuario");
+    user = JSON.parse(user);
     try {
-        const res = await fetch(DADOS_URL);
-        const atividades = await res.json();
+        const res = await fetch(`${DADOS_URL}`);
+        const resJson = await res.json();
+        const atividades = resJson.filter(a => a.user_id === user)
         const metaRes = await fetch(META_URL);
         const meta = await metaRes.json();
         const today = new Date();
@@ -110,7 +293,7 @@ async function getNextAppointment() {
 
         atividades.forEach(activity => {
             const start = new Date(activity.date.start);
-            if (!mindate && start >= today|| start < mindate && start >= today) {
+            if (!mindate && start >= today || start < mindate && start >= today) {
                 mindate = start;
                 nextActivity = activity;
             }
@@ -155,9 +338,12 @@ async function getNextAppointment() {
 // ======== TOTAL DE ATIVIDADES ========
 async function totalActivities() {
     const container = document.getElementById('stats-number');
+    let user = sessionStorage.getItem("usuario");
+    user = JSON.parse(user);
     try {
-        const res = await fetch(DADOS_URL);
-        const atividades = await res.json();
+        const res = await fetch(`${DADOS_URL}`);
+        const resJson = await res.json();
+        const atividades = resJson.filter(a => a.user_id === user)
         container.innerHTML = atividades.length;
     } catch (err) {
         container.innerHTML = "-";
@@ -171,6 +357,8 @@ async function getActivity() {
     const id = params.get('id');
     const category = params.get('category');
     const tela = document.getElementById('next-appointment');
+    let user = sessionStorage.getItem("usuario");
+    user = JSON.parse(user);
 
     try {
         if (id) {
@@ -192,6 +380,9 @@ async function getActivity() {
                         <button class="btn btn-sm btn-outline-danger border-0 delete-btn" onclick="deleteActivity(${activity.id})">
                         <i class="fa-solid fa-xmark fa-lg"></i>
                         </button>
+                        <button class="btn btn-sm btn-outline-secondary border-0 favorite-btn" onclick="setFavorite(${activity.id})">
+                        <i class="fa-${(activity.favorite) ? "solid" : "regular"} fa-star fa-lg"></i>
+                        </button>
                     </h3>
                     </header>
                 <div class="card-style-content" id="activity-${activity.id}">
@@ -209,10 +400,11 @@ async function getActivity() {
                 </div>`;
         } else if (category) {
             const res = await fetch(`${DADOS_URL}?category=${category}`);
-            const atividades = await res.json();
+            const resJson = await res.json();
+            const atividades = resJson.filter(a => a.user_id === user)
 
             if (atividades.length === 0) {
-                tela.innerHTML = "<p>Não há atividades nessa category.</p>";
+                tela.innerHTML = "<p>Não há atividades nessa categoria.</p>";
                 return;
             }
 
@@ -229,6 +421,9 @@ async function getActivity() {
                         </button>
                         <button class="btn btn-sm btn-outline-danger border-0 delete-btn" onclick="deleteActivity(${nextActivity.id})">
                         <i class="fa-solid fa-xmark fa-lg"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary border-0 favorite-btn" onclick="setFavorite(${nextActivity.id})">
+                        <i class="fa-${(nextActivity.favorite) ? "solid" : "regular"} fa-star fa-lg"></i>
                         </button>
                     </h3>
                     </header>
@@ -295,6 +490,8 @@ async function carouselItemsByCategory() {
 async function loadActivitiesByCategory() {
     const params = new URLSearchParams(location.search);
     const category = params.get('category');
+    let user = sessionStorage.getItem("usuario");
+    user = JSON.parse(user);
 
     const container = document.getElementById('activities-cards');
     container.innerHTML = "<p>Carregando...</p>";
@@ -309,7 +506,8 @@ async function loadActivitiesByCategory() {
         const metaRes = await fetch(META_URL);
         const meta = await metaRes.json();
         if (!res.ok) throw new Error('Erro ao buscar atividades por categoria');
-        const atividades = await res.json();
+        const resJson = await res.json();
+        const atividades = resJson.filter(a => a.user_id === user)
 
         if (!atividades || atividades.length === 0) {
             container.innerHTML = "<p>Não há atividades nesta categoria.</p>";
@@ -363,6 +561,8 @@ async function createNewActivity() {
     const local = document.getElementById("local").value;
     const start = document.getElementById("start").value;
     const end = document.getElementById("end").value;
+    let user_id = sessionStorage.getItem("usuario");
+    user_id = JSON.parse(user_id);
 
     try {
         const response = await fetch(DADOS_URL, {
@@ -377,6 +577,8 @@ async function createNewActivity() {
                 },
                 "local": local,
                 "category": category,
+                "favorite": false,
+                "user_id": user_id
             })
         });
 
@@ -483,12 +685,43 @@ async function saveActivity(id) {
     }
 }
 
+// ======== ALTERA O STATUS DE FAVORITO ========
+async function setFavorite(id) {
+    try {
+        const res = await fetch(`${DADOS_URL}/${id}`);
+        const atual = await res.json();
+
+        const atualizado = {
+            ...atual,
+            favorite: !atual.favorite
+        };
+
+        const put = await fetch(`${DADOS_URL}/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(atualizado)
+        });
+
+        if (put.ok) {
+            window.location.reload();
+        } else {
+            alert("Erro ao salvar alterações.");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Erro de conexão.");
+    }
+}
+
 // ======== FILTRA OS EVENTOS A SEREM EXIBIDOS NO CALENDÁRIO ========
 async function filterEvents(type) {
     const container = document.querySelector(`.${type}`);
     container.id = "active-item";
     const response = await fetch(DADOS_URL);
-    const data = await response.json();
+    const resJson = await response.json();
+    let user = sessionStorage.getItem("usuario");
+    user = JSON.parse(user);
+    const data = resJson.filter(a => a.user_id === user)
 
     let filteredData = [];
 
@@ -586,8 +819,11 @@ function filterEventsByDate(events, targetDate) {
 
 // ======== BUSCA OS EVENTOS CONFORME AS DATAS FORNECIDAS ========
 async function fetchWeekValues(dates) {
+    let user = sessionStorage.getItem("usuario");
+    user = JSON.parse(user);
     const response = await fetch(DADOS_URL);
-    const allEvents = await response.json();
+    const resJson = await response.json();
+    const allEvents = resJson.filter(a => a.user_id === user)
 
     const values = dates.map(d => {
         const filtered = allEvents.filter(ev => {

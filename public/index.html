@@ -25,6 +25,14 @@
 </head>
 
 <body>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const login = checkIfLogged();
+            if (!login) {
+                window.location.href = "login.html";
+            }
+        });
+    </script>
     <input type="checkbox" id="menu-toggle">
     <label for="menu-toggle" class="menu-btn">
         <i class="fa-solid fa-bars fa-lg"></i>
@@ -36,7 +44,12 @@
                 <img src="https://picsum.photos/id/50/50" class="avatar">
                 <div>
                     <p id="welcome">Bem-vindo,</p>
-                    <p id="user">Usuário</p>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            getUser();
+                        });
+                    </script>
+                    <p id="user"></p>
                 </div>
             </div>
 
@@ -46,6 +59,12 @@
                         <a href="index.html" class="nav-link-style" id="active-item">
                             <i class="fas fa-regular fa-house"></i>
                             <span>HomePage</span>
+                        </a>
+                    </li>
+                    <li class="nav-item-style">
+                        <a href="favorites.html" class="nav-link-style">
+                            <i class="fas fa-star"></i>
+                            <span>Página de Favoritos</span>
                         </a>
                     </li>
                     <li class="nav-item-style">
@@ -81,6 +100,10 @@
                 <i class="fas fa-regular fa-gear"></i>
                 <span>Configurações</span>
             </a>
+            <button class="nav-link-style" id="logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span onclick="logout()" class="btn-text">Sair</span>
+            </button>
         </aside>
 
         <main class="main-content">
@@ -134,16 +157,34 @@
                             </button>
                         </div>
 
+                        <div class="separator"></div>
+
                         <article class="card-style">
-                            <header class="card-style-header">
-                                <h3 class="card-style-title">
+                            <header class="card-style-header row">
+                                <h3 class="card-style-title col-8">
                                     Atividades
                                 </h3>
+                                <div class="col-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-end-0">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </span>
+                                        <input type="text" id="search-activities" class="form-control border-start-0"
+                                            placeholder="Buscar por título...">
+                                    </div>
+                                </div>
                             </header>
                             <div class="row" id="activities-cards">
                                 <script>
                                     document.addEventListener("DOMContentLoaded", function () {
                                         loadMainActivities();
+                                        const input = document.getElementById("search-activities");
+
+                                        input.addEventListener("input", function (e) {
+                                            // evita chamadas com valores null/undefined
+                                            const value = (e && e.target && e.target.value) ? e.target.value : "";
+                                            searchItems(value);
+                                        });
                                     });
                                 </script>
                             </div>
@@ -169,13 +210,13 @@
 
                         <article class="card-style">
                             <header class="card-style-header">
-                                <h3 class="card-style-title" style="justify-content: center;">Resumo da Semana</h3>
+                                <h3 class="card-style-title" style="justify-content: center;">Resumo da Semana Atual</h3>
                             </header>
                             <div class="card-style-content">
                                 <div class="chart-container">
                                     <canvas id="weekChart">
                                         <script>
-                                            document.addEventListener("DOMContentLoaded", function() {
+                                            document.addEventListener("DOMContentLoaded", function () {
                                                 listWeekEvents();
                                             });
                                         </script>
@@ -189,7 +230,31 @@
         </main>
     </div>
     <footer class="footer">
-        <p>&copy; 2025 Agenda Organizacional. Todos os direitos reservados.</p>
+        <h3 class="footer-title">Informações do(a) Aluno(a)</h3>
+        <div class="footer-content">
+            <div class="footer-sobre">
+                <h4>Sobre</h4>
+                Sou um profissional com experiência em infraestrutura cloud e monitoramento de sistemas, atuando com AWS, Azure, Python, Linux, Dynatrace, Zabbix e Grafana. Busco desenvolver soluções eficientes, com foco em desempenho, clareza e qualidade visual.
+            </div>
+
+            <div class="footer-autoria">
+                <h4>Autoria</h4>
+                <div class="aluno-info">
+                    <i class="fa-solid fa-user fa-lg"></i>
+                    <div>
+                        <p><strong>Aluno:</strong> Arthur Isaque Colen de Paula</p>
+                        <p><strong>Curso:</strong> Sistemas de Informação</p>
+                        <p><strong>Turma:</strong> Noite</p>
+                    </div>
+                </div>
+
+                <div class="footer-redes">
+                    <h4>Redes Sociais:</h4>
+                    <a href="https://www.linkedin.com/in/arthur-colen-42406a267/"><i class="fa-brands fa-linkedin fa-lg"></i></a>
+                    <a href="https://github.com/arthurcolen"><i class="fa-brands fa-github fa-lg"></i></a>
+                </div>
+            </div>
+        </div>
     </footer>
 </body>
 

@@ -190,6 +190,11 @@ p#user {
     padding: 1.25rem 1.25rem 1rem;
 }
 
+.card-style-header#search-header {
+    display: flex;
+    justify-content: space-between;
+}
+
 .card-style-title {
     display: flex;
     align-items: center;
@@ -221,7 +226,12 @@ article header .card-style-title {
 
 .appointment-info {
     display: flex;
+    border: 1px solid;
+    border-radius: 0.5rem;
     gap: 1rem;
+    background: #ecf4ff;
+    color: #101c3f;
+    border-color: #bfdbfe;
 }
 
 .appointment-icon {
@@ -264,18 +274,27 @@ article header .card-style-title {
 
 .delete-btn {
   position: absolute;
-  top: 50%;
+  top: 30%;
   right: 1rem;
-  transform: translateY(-50%);
+  transform: translateY(-30%);
   margin: 0;
   padding: 0;
 }
 
 .edit-btn {
   position: absolute;
-  top: 50%;
+  top: 30%;
   right: 3rem; /* fica antes do X */
-  transform: translateY(-50%);
+  transform: translateY(-30%);
+  margin: 0;
+  padding: 0;
+}
+
+.favorite-btn {
+  position: absolute;
+  top: 30%;
+  right: 5rem; /* fica antes do X */
+  transform: translateY(-30%);
   margin: 0;
   padding: 0;
 }
